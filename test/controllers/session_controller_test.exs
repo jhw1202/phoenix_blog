@@ -28,4 +28,13 @@ defmodule Pxblog.SessionControllerTest do
     assert get_flash(conn, :error) =~ "Invalid"
     assert redirected_to(conn) == page_path(conn, :index)
   end
+
+  test "deletes user sesson", %{conn: conn} do
+    user = Repo.get_by(User, %{username: "test_username"})
+    conn = post conn, session_path(conn, :create), user: %{username: "test_username", password: "test_password"}
+    conn = delete conn, session_path(conn, :delete, user)
+    refute get_session(conn, :current_user)
+    assert get_flash(conn, :info) =~ "Signed out"
+    assert redirected_to(conn) == page_path(conn, :index)
+  end
 end
