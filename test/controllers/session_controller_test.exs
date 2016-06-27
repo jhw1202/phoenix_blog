@@ -29,7 +29,7 @@ defmodule Pxblog.SessionControllerTest do
     assert redirected_to(conn) == page_path(conn, :index)
   end
 
-  test "deletes user sesson", %{conn: conn} do
+  test "deletes user session", %{conn: conn} do
     user = Repo.get_by(User, %{username: "test_username"})
     conn = post conn, session_path(conn, :create), user: %{username: "test_username", password: "test_password"}
     conn = delete conn, session_path(conn, :delete, user)
