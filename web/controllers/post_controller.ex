@@ -1,17 +1,22 @@
 defmodule Pxblog.PostController do
   use Pxblog.Web, :controller
-
   alias Pxblog.Post
 
   plug :scrub_params, "post" when action in [:create, :update]
+  plug :assign_user
 
   def index(conn, _params) do
-    posts = Repo.all(Post)
+    posts =
+      assoc(conn.assigns[:user], :posts)
+      |> Repo.all()
     render(conn, "index.html", posts: posts)
   end
 
   def new(conn, _params) do
-    changeset = Post.changeset(%Post{})
+    changeset =
+      conn.assigns[:user]
+      |> build_assoc(:posts)
+      |> Post.changeset()
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -22,7 +27,7 @@ defmodule Pxblog.PostController do
       {:ok, _post} ->
         conn
         |> put_flash(:info, "Post created successfully.")
-        |> redirect(to: post_path(conn, :index))
+        |> redirect(to: user_post_path(conn, :index, conn.assigns[:user]))
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
@@ -47,7 +52,7 @@ defmodule Pxblog.PostController do
       {:ok, post} ->
         conn
         |> put_flash(:info, "Post updated successfully.")
-        |> redirect(to: post_path(conn, :show, post))
+        |> redirect(to: user_post_path(conn, :show, conn.assigns[:user], post))
       {:error, changeset} ->
         render(conn, "edit.html", post: post, changeset: changeset)
     end
@@ -62,6 +67,24 @@ defmodule Pxblog.PostController do
 
     conn
     |> put_flash(:info, "Post deleted successfully.")
-    |> redirect(to: post_path(conn, :index))
+    |> redirect(to: user_post_path(conn, :index, conn.assigns[:user]))
+  end
+
+  defp assign_user(conn, _opts) do
+    case conn.params do
+      %{"user_id" => user_id} ->
+        case Repo.get(Pxblog.User, user_id) do
+          nil -> invalid_user(conn)
+          user -> assign(conn, :user, user)
+        end
+      _ -> invalid_user(conn)
+    end
+  end
+
+  defp invalid_user(conn) do
+    conn
+    |> put_flash(:error, "Invalid user")
+    |> redirect(to: page_path(conn, :index))
+    |> halt()
   end
 end
