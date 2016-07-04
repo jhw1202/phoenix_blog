@@ -4,7 +4,6 @@ defmodule Pxblog.LayoutViewTest do
   alias Pxblog.TestHelper
   alias Pxblog.LayoutView
   alias Pxblog.User
-  alias Pxblog.Role
 
   setup do
     {:ok, role} = TestHelper.create_role(%{name: "User Role", admin: false})

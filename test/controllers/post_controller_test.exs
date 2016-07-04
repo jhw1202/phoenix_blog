@@ -3,7 +3,6 @@ defmodule Pxblog.PostControllerTest do
 
   alias Pxblog.TestHelper
   alias Pxblog.Post
-  alias Pxblog.User
 
   @valid_attrs %{body: "some content", title: "some content"}
   @invalid_attrs %{"body" => nil}
@@ -19,14 +18,6 @@ defmodule Pxblog.PostControllerTest do
 
   defp login_user(conn, user) do
     post conn, session_path(conn, :create), user: %{username: user.username, password: user.password}
-  end
-
-  defp build_post(user) do
-    changeset =
-      user
-      |> build_assoc(:posts)
-      |> Post.changeset(@valid_attrs)
-    Repo.insert(changeset)
   end
 
   test "lists all entries on index", %{conn: conn, user: user} do
