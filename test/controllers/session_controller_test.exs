@@ -1,11 +1,14 @@
 defmodule Pxblog.SessionControllerTest do
   use Pxblog.ConnCase
+
+  alias Pxblog.TestHelper
+  alias Pxblog.Repo
   alias Pxblog.User
 
   setup do
-    User.changeset(%User{}, %{username: "test_username", password: "test_password",
-                              password_confirmation: "test_password", email: "test@test.com"})
-    |> Repo.insert
+    {:ok, role} = TestHelper.create_role(%{name: "User", admin: false})
+    {:ok, _user} = TestHelper.create_user(role, %{username: "test", email: "test@test.com",
+                                                  password: "test", password_confirmation: "test"})
     conn = conn()
     {:ok, conn: conn}
   end
@@ -16,7 +19,7 @@ defmodule Pxblog.SessionControllerTest do
   end
 
   test "creates new user session for a valid user", %{conn: conn} do
-    conn = post conn, session_path(conn, :create), user: %{username: "test_username", password: "test_password"}
+    conn = post conn, session_path(conn, :create), user: %{username: "test", password: "test"}
     assert get_session(conn, :current_user)
     assert get_flash(conn, :info) =~ "successful"
     assert redirected_to(conn) == page_path(conn, :index)
@@ -30,8 +33,8 @@ defmodule Pxblog.SessionControllerTest do
   end
 
   test "deletes user session", %{conn: conn} do
-    user = Repo.get_by(User, %{username: "test_username"})
-    conn = post conn, session_path(conn, :create), user: %{username: "test_username", password: "test_password"}
+    user = Repo.get_by(User, %{username: "test"})
+    conn = post conn, session_path(conn, :create), user: %{username: "test", password: "test"}
     conn = delete conn, session_path(conn, :delete, user)
     refute get_session(conn, :current_user)
     assert get_flash(conn, :info) =~ "Signed out"

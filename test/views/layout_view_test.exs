@@ -1,23 +1,26 @@
 defmodule Pxblog.LayoutViewTest do
   use Pxblog.ConnCase
+
+  alias Pxblog.TestHelper
   alias Pxblog.LayoutView
   alias Pxblog.User
+  alias Pxblog.Role
 
   setup do
-    User.changeset(%User{}, %{username: "test_username", password: "test_password",
-                              password_confirmation: "test_password", email: "test@test.com"})
-    |> Repo.insert
+    {:ok, role} = TestHelper.create_role(%{name: "User Role", admin: false})
+  {:ok, user} = TestHelper.create_user(role, %{email: "test@test.com", username: "testuser",
+                                           password: "test", password_confirmation: "test"})
     conn = conn()
-    {:ok, conn: conn}
+    {:ok, conn: conn, user: user}
   end
 
-  test "current_user returns user in session", %{conn: conn} do
-    conn = post conn, session_path(conn, :create), user: %{username: "test_username", password: "test_password"}
+  test "current_user returns user in session", %{conn: conn, user: user} do
+    conn = post conn, session_path(conn, :create), user: %{username: user.username, password: user.password}
     assert LayoutView.current_user(conn)
   end
 
-  test "current_user returns nil if no user in session", %{conn: conn} do
-    user = Repo.get_by(User, %{username: "test_username"})
+  test "current_user returns nil if no user in session", %{conn: conn, user: user} do
+    user = Repo.get_by(User, %{username: user.username})
     conn = delete conn, session_path(conn, :delete, user)
     refute LayoutView.current_user(conn)
   end
