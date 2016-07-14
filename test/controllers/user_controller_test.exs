@@ -1,6 +1,7 @@
 defmodule Pxblog.UserControllerTest do
   use Pxblog.ConnCase
 
+  alias Pxblog.Factory
   alias Pxblog.TestHelper
   alias Pxblog.User
 
@@ -9,11 +10,11 @@ defmodule Pxblog.UserControllerTest do
   @invalid_attrs %{}
 
   setup do
-    {:ok, user_role} = TestHelper.create_role(%{name: "user", admin: false})
+    user_role = Factory.create(:role)
     {:ok, non_admin_user} = TestHelper.create_user(user_role, %{email: "normal@user.com", username: "normal",
                                                                 password: "test", password_confirmation: "test"})
 
-    {:ok, admin_role} = TestHelper.create_role(%{name: "admin", admin: true})
+    admin_role = Factory.create(:role, admin: true)
     {:ok, admin_user} = TestHelper.create_user(admin_role, %{email: "admin@user.com", username: "admin",
                                                              password: "test", password_confirmation: "test"})
 
