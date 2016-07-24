@@ -21,6 +21,11 @@
     <%= @user.password_digest %>
   </li>
 
+  <li>
+    <strong>Admin</strong>
+    <%= Pxblog.RoleChecker.is_admin?(@user) %>
+  </li>
+
 </ul>
 
 <%= link "Edit", to: user_path(@conn, :edit, @user) %>
