@@ -42,7 +42,12 @@ defmodule Pxblog.PostController do
       conn.assigns[:user]
       |> assoc(:posts)
       |> Repo.get!(id)
-    render(conn, "show.html", post: post)
+      |> Repo.preload(:comments)
+    comment_changeset =
+      post
+      |> build_assoc(:comments)
+      |> Pxblog.Comment.changeset()
+    render(conn, "show.html", post: post, comment_changeset: comment_changeset)
   end
 
   def edit(conn, %{"id" => id}) do
