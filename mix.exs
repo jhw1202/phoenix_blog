@@ -32,12 +32,14 @@ defmodule Pxblog.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.1.6"},
      {:postgrex, ">= 0.0.0"},
-     {:phoenix_ecto, "~> 2.0"},
+     {:phoenix_ecto, "~> 3.0"},
      {:phoenix_html, "~> 2.4"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
-     {:comeonin, "~> 2.4"}]
+     {:comeonin, "~> 2.4"},
+     {:ex_machina, "~> 1.0", only: :test},
+     {:earmark, "~> 0.2.1"}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.
